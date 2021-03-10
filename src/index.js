@@ -101,9 +101,10 @@ class Game extends React.Component {
     const moves = history.map((step, move) => {
       const desc = move ? 'Go to move #' + move : 'Go to game start';
       const location = move ? getLocation(step.location) : '';
+      const applyStyle = move === this.state.stepNumber 
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button> {location}
+          <button className={applyStyle ? 'current-move' : null} onClick={() => this.jumpTo(move)}>{desc}</button> {location}
         </li>
       );
     });

@@ -51,6 +51,7 @@ class Game extends React.Component {
     this.state = {
       history: [{
         squares: Array(9).fill(null),
+        location: 0,
       }],
       //the trailing comma is a coding convention for cleaner git commits
       //See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Trailing_commas
@@ -79,6 +80,7 @@ class Game extends React.Component {
       //concat does not mutate the array
       history: history.concat([{
         squares: squares,
+        location: i,
       }]),
       xIsNext: !this.state.xIsNext,
       stepNumber: history.length,
@@ -92,16 +94,16 @@ class Game extends React.Component {
     });
   }
 
-
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
     const moves = history.map((step, move) => {
       const desc = move ? 'Go to move #' + move : 'Go to game start';
+      const location = move ? getLocation(step.location) : '';
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button onClick={() => this.jumpTo(move)}>{desc}</button> {location}
         </li>
       );
     });
@@ -153,5 +155,13 @@ function calculateWinner(squares) {
     }
   }
   return null;
+}
+
+function getLocation(arrayIndex) {
+  const gridSize = 3;
+  const offset = 1; //Start grid columns & rows at 1 instead of 0 for easier reading
+  const col = offset + arrayIndex % gridSize;
+  const row = offset + Math.floor(arrayIndex / gridSize);
+  return `[${col},${row}]`
 }
 

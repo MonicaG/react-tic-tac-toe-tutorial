@@ -15,31 +15,34 @@ class Board extends React.Component {
 
   renderSquare(i) {
     return (
-      <Square
+      <Square key={i}
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
       />
     );
   }
 
+  renderBoardRow(rowNum) {
+    let squares = [];
+    for(let colNum=0; colNum<this.props.gridSize; colNum++) {
+      const arrayIndex = colNum + this.props.gridSize * rowNum;
+      squares = squares.concat(this.renderSquare(arrayIndex));
+    }
+    return (
+      <div key={rowNum} className="board-row">
+        {squares}
+      </div>
+    )
+  }
+
   render() {
+    let rows = [];
+    for (let rowNum = 0; rowNum < this.props.gridSize; rowNum++) {
+      rows = rows.concat(this.renderBoardRow(rowNum))
+    }
     return (
       <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+        {rows}
       </div>
     );
   }
@@ -48,6 +51,7 @@ class Board extends React.Component {
 class Game extends React.Component {
   constructor(props) {
     super(props);
+    this.gridSize = 3
     this.state = {
       history: [{
         squares: Array(9).fill(null),
@@ -100,8 +104,8 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
     const moves = history.map((step, move) => {
       const desc = move ? 'Go to move #' + move : 'Go to game start';
-      const location = move ? getLocation(step.location) : '';
-      const applyStyle = move === this.state.stepNumber 
+      const location = move ? getLocation(step.location, this.gridSize) : '';
+      const applyStyle = move === this.state.stepNumber
       return (
         <li key={move}>
           <button className={applyStyle ? 'current-move' : null} onClick={() => this.jumpTo(move)}>{desc}</button> {location}
@@ -119,6 +123,7 @@ class Game extends React.Component {
         <div className="game-board">
           <Board
             squares={current.squares}
+            gridSize={this.gridSize}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
@@ -158,8 +163,7 @@ function calculateWinner(squares) {
   return null;
 }
 
-function getLocation(arrayIndex) {
-  const gridSize = 3;
+function getLocation(arrayIndex, gridSize) {
   const offset = 1; //Start grid columns & rows at 1 instead of 0 for easier reading
   const col = offset + arrayIndex % gridSize;
   const row = offset + Math.floor(arrayIndex / gridSize);

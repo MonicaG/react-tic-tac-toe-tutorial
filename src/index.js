@@ -11,6 +11,14 @@ function Square(props) {
   );
 }
 
+function SortOrder(props) {
+  return (
+    <button onClick={props.onClick}>
+      {props.orderMovesAsc ? 'Sort Moves Desc' : 'Sort Moves Asc'}
+    </button>
+  )
+}
+
 class Board extends React.Component {
 
   renderSquare(i) {
@@ -61,6 +69,7 @@ class Game extends React.Component {
       //See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Trailing_commas
       xIsNext: true,
       stepNumber: 0,
+      orderMovesAsc: true,
     };
   }
 
@@ -91,6 +100,13 @@ class Game extends React.Component {
     })
   }
 
+  handleSortOrder() {
+    this.setState({
+     orderMovesAsc: !this.state.orderMovesAsc
+    });
+  
+  }
+
   jumpTo(step) {
     this.setState({
       stepNumber: step,
@@ -118,6 +134,9 @@ class Game extends React.Component {
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
+    if(!this.state.orderMovesAsc) {
+      moves.reverse()
+    }
     return (
       <div className="game">
         <div className="game-board">
@@ -129,6 +148,12 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <div className="sort-button">
+            <SortOrder
+              orderMovesAsc = {this.state.orderMovesAsc}
+              onClick={() => this.handleSortOrder() }
+            />
+          </div>
           <ol>{moves}</ol>
         </div>
       </div>

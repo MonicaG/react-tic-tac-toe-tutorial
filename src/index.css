@@ -52,3 +52,8 @@ ol, ul {
 .current-move {
   font-weight: bold;
 }
+
+.sort-button {
+  margin-top: 10px;
+  padding-left: 30px;
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
+const DRAW = "D";
 
 function Square(props) {
   const winningSquareStyle = props.winningSquare ? "winning-square" : "";
@@ -86,12 +87,12 @@ class Game extends React.Component {
     */
     const squares = current.squares.slice();
 
-    //don't set the state if the game is won or the square is already occupied.
-    const [hasWinner] = calculateWinner(squares);
-    if ( hasWinner || squares[i]) {
+    //don't set the state if the game is won or tied or the square is already occupied.
+    const [gameOver] = calculateWinner(squares);
+    if ( gameOver || squares[i]) {
       return
     }
-    squares[i] = this.state.xIsNext ? 'X' : 'O'
+    squares[i] = this.state.xIsNext ? 'X' : 'O';
     this.setState({
       //concat does not mutate the array
       history: history.concat([{
@@ -132,7 +133,9 @@ class Game extends React.Component {
       );
     });
     let status;
-    if (winner) {
+    if (winner && winner === DRAW) {
+      status = 'Draw: No winner.'
+    } else if (winner) {
       status = 'Winner: ' + winner;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
@@ -189,7 +192,11 @@ function calculateWinner(squares) {
       return [squares[a], lines[i]];
     }
   }
-  return [null,null];
+  if (squares.includes(null)) {
+    return [null, null];
+  } else {
+    return [DRAW, null];
+  }
 }
 
 function getLocation(arrayIndex, gridSize) {

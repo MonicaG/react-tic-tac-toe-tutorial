@@ -4,8 +4,9 @@ import './index.css';
 
 
 function Square(props) {
+  const winningSquareStyle = props.winningSquare ? "winning-square" : "";
   return (
-    <button className="square" onClick={props.onClick}>
+    <button className={`square ${winningSquareStyle}`} onClick={props.onClick}>
       {props.value}
     </button>
   );
@@ -24,6 +25,7 @@ class Board extends React.Component {
   renderSquare(i) {
     return (
       <Square key={i}
+        winningSquare={this.props.winningSquares?.includes(i)}
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
       />
@@ -85,7 +87,8 @@ class Game extends React.Component {
     const squares = current.squares.slice();
 
     //don't set the state if the game is won or the square is already occupied.
-    if (calculateWinner(squares) || squares[i]) {
+    const [hasWinner] = calculateWinner(squares);
+    if ( hasWinner || squares[i]) {
       return
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O'
@@ -117,7 +120,7 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
+    const [winner, winningSquares] = calculateWinner(current.squares);
     const moves = history.map((step, move) => {
       const desc = move ? 'Go to move #' + move : 'Go to game start';
       const location = move ? getLocation(step.location, this.gridSize) : '';
@@ -143,6 +146,7 @@ class Game extends React.Component {
           <Board
             squares={current.squares}
             gridSize={this.gridSize}
+            winningSquares={winningSquares}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
@@ -182,10 +186,10 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return [squares[a], lines[i]];
     }
   }
-  return null;
+  return [null,null];
 }
 
 function getLocation(arrayIndex, gridSize) {
